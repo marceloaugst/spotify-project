@@ -53,10 +53,10 @@ const Song = () => {
         </Link>
 
         <Player
-          audio={audio}
           duration={duration}
           randomIdFromArtist={randomIdFromArtist}
           randomId2FromArtist={randomId2FromArtist}
+          audio={audio}
         />
 
         <div>

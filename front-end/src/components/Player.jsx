@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCirclePlay,
@@ -7,22 +7,25 @@ import {
   faForwardStep,
 } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
+import { useRef, useEffect } from "react";
 
 const formatTime = (timeInSeconds) => {
   const minutes = Math.floor(timeInSeconds / 60)
     .toString()
     .padStart(2, "0");
-  const seconds = Math.floor(timeInSeconds % 60)
+  const seconds = Math.floor(timeInSeconds - minutes * 60)
     .toString()
     .padStart(2, "0");
+
   return `${minutes}:${seconds}`;
 };
 
 const timeInSeconds = (timeString) => {
   const splitArray = timeString.split(":");
-  const minutes = parseInt(splitArray[0]);
-  const seconds = parseInt(splitArray[1]);
-  return minutes * 60 + seconds;
+  const minutes = Number(splitArray[0]);
+  const seconds = Number(splitArray[1]);
+
+  return seconds + minutes * 60;
 };
 
 const Player = ({
@@ -31,17 +34,23 @@ const Player = ({
   randomId2FromArtist,
   audio,
 }) => {
+  // const audioPlayer...
   const audioPlayer = useRef();
   const progressBar = useRef();
   const [isPlaying, setIsPlaying] = useState(false);
-  const [correntTime, setCurrentTime] = useState(formatTime(0));
+  const [currentTime, setCurrentTime] = useState(formatTime(0));
   const durationInSeconds = timeInSeconds(duration);
 
-  const playOrPause = () => {
+  // console.log(durationInSeconds);
+
+  // função
+  // console.log(audioPlayer.current.play());
+  const playPause = () => {
     isPlaying ? audioPlayer.current.pause() : audioPlayer.current.play();
 
     setIsPlaying(!isPlaying);
-    setCurrentTime(formatTime(audioPlayer.current.currentTime));
+
+    // console.log(formatTime(audioPlayer.current.currentTime));
   };
 
   useEffect(() => {
@@ -58,6 +67,8 @@ const Player = ({
     return () => clearInterval(intervalId);
   }, [isPlaying]);
 
+  // setIsPlaying(false)
+
   return (
     <div className="player">
       <div className="player__controllers">
@@ -68,7 +79,7 @@ const Player = ({
         <FontAwesomeIcon
           className="player__icon player__icon--play"
           icon={isPlaying ? faCirclePause : faCirclePlay}
-          onClick={() => playOrPause()}
+          onClick={() => playPause()}
         />
 
         <Link to={`/song/${randomId2FromArtist}`}>
@@ -77,7 +88,7 @@ const Player = ({
       </div>
 
       <div className="player__progress">
-        <p>{correntTime}</p>
+        <p>{currentTime}</p>
 
         <div className="player__bar">
           <div ref={progressBar} className="player__bar-progress"></div>
@@ -85,6 +96,7 @@ const Player = ({
 
         <p>{duration}</p>
       </div>
+
       <audio ref={audioPlayer} src={audio}></audio>
     </div>
   );
